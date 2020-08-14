@@ -89,7 +89,7 @@ func NewConverterProvider(cfg converter.ProviderConfig) (ConverterProvider, erro
 	if err := add(org.Provider); err != nil {
 		return nil, err
 	}
-	if err := add(gocw.Provider); err != nil {
+	if err := add(gocw.Provider, "xml"); err != nil {
 		return nil, err
 	}
 

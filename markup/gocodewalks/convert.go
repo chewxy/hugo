@@ -15,6 +15,8 @@
 package gocw
 
 import (
+	"log"
+
 	"github.com/gohugoio/hugo/identity"
 	"github.com/gohugoio/hugo/markup/converter"
 )
@@ -48,14 +50,15 @@ func (c *cv) Convert(ctx converter.RenderContext) (converter.Result, error) {
 func (c *cv) Supports(feature identity.Identity) bool { return false } // TODO
 
 func (c *cv) convert(bs []byte) []byte {
+	log.Printf("Document Type %T", c.ctx.Document)
 
-	switch c.ctx.Document.(type) {
+	//switch c.ctx.Document.(type) {
 	//case page.Page
 	// cw := loadCodeWalk1()
 	// return applyTemplate(codewalkHTML, "codewalk", cw)
 	// case page bundles?
-	case nil:
-	}
+	//case nil:
+	//}
 
 	return nil // TODO
 }
