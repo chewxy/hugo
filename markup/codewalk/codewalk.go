@@ -5,7 +5,7 @@
 // Most of this file is stolen from the original go/src/cmd/godoc/codewalk.go file.
 // It generates code walks according to a given template (in Hugo terms, an archetype)
 
-package gocw
+package codewalk
 
 import (
 	"bytes"

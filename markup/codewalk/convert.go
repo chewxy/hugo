@@ -11,12 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package gocw converts Codewalk formatted input to the given HTML.
-package gocw
+// Package codewalk converts Codewalk formatted input to the given HTML.
+package codewalk
 
 import (
-	"log"
-
 	"github.com/gohugoio/hugo/identity"
 	"github.com/gohugoio/hugo/markup/converter"
 )
@@ -29,7 +27,7 @@ var (
 type provider struct{}
 
 func (p provider) New(cfg converter.ProviderConfig) (converter.Provider, error) {
-	return converter.NewProvider("gocodewalk", func(ctx converter.DocumentContext) (converter.Converter, error) {
+	return converter.NewProvider("codewalk", func(ctx converter.DocumentContext) (converter.Converter, error) {
 		return &cv{
 			ctx: ctx,
 			cfg: cfg,
@@ -50,7 +48,6 @@ func (c *cv) Convert(ctx converter.RenderContext) (converter.Result, error) {
 func (c *cv) Supports(feature identity.Identity) bool { return false } // TODO
 
 func (c *cv) convert(bs []byte) []byte {
-	log.Printf("Document Type %T", c.ctx.Document)
 
 	//switch c.ctx.Document.(type) {
 	//case page.Page
