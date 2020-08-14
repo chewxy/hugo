@@ -27,6 +27,7 @@ import (
 	"github.com/gohugoio/hugo/markup/asciidocext"
 	"github.com/gohugoio/hugo/markup/blackfriday"
 	"github.com/gohugoio/hugo/markup/converter"
+	gocw "github.com/gohugoio/hugo/markup/gocodewalks"
 	"github.com/gohugoio/hugo/markup/mmark"
 	"github.com/gohugoio/hugo/markup/pandoc"
 	"github.com/gohugoio/hugo/markup/rst"
@@ -86,6 +87,9 @@ func NewConverterProvider(cfg converter.ProviderConfig) (ConverterProvider, erro
 		return nil, err
 	}
 	if err := add(org.Provider); err != nil {
+		return nil, err
+	}
+	if err := add(gocw.Provider); err != nil {
 		return nil, err
 	}
 

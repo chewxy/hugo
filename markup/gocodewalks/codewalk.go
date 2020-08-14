@@ -9,12 +9,17 @@ package gocw
 
 import (
 	"bytes"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
+	"sort"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -300,4 +305,69 @@ func applyTemplate(t *template.Template, name string, data interface{}) []byte {
 		log.Printf("%s.Execute: %s", name, err)
 	}
 	return buf.Bytes()
+}
+
+// loadCodewalk1 loads a codewalk from 1 file.
+//
+// loadCodewalk1 is adapted from the original loadCodewalk.
+
+// loadCodewalk reads a codewalk from the named XML file.
+func loadCodewalk(filename string) (*Codewalk, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	cw := new(Codewalk)
+	d := xml.NewDecoder(f)
+	d.Entity = xml.HTMLEntity
+	err = d.Decode(cw)
+	if err != nil {
+		return nil, &os.PathError{Op: "parsing", Path: filename, Err: err}
+	}
+
+	// Compute file list, evaluate line numbers for addresses.
+	m := make(map[string]bool)
+	for _, st := range cw.Step {
+		i := strings.Index(st.Src, ":")
+		if i < 0 {
+			i = len(st.Src)
+		}
+		filename := st.Src[0:i]
+		data, err := ioutil.ReadFile(filename)
+		if err != nil {
+			st.Err = err
+			continue
+		}
+		if i < len(st.Src) {
+			lo, hi, err := addrToByteRange(st.Src[i+1:], 0, data)
+			if err != nil {
+				st.Err = err
+				continue
+			}
+			// Expand match to line boundaries.
+			for lo > 0 && data[lo-1] != '\n' {
+				lo--
+			}
+			for hi < len(data) && (hi == 0 || data[hi-1] != '\n') {
+				hi++
+			}
+			st.Lo = byteToLine(data, lo)
+			st.Hi = byteToLine(data, hi-1)
+		}
+		st.Data = data
+		st.File = filename
+		m[filename] = true
+	}
+
+	// Make list of files
+	cw.File = make([]string, len(m))
+	i := 0
+	for f := range m {
+		cw.File[i] = f
+		i++
+	}
+	sort.Strings(cw.File)
+
+	return cw, nil
 }

@@ -14,18 +14,21 @@
 // Package gocw converts Codewalk formatted input to the given HTML.
 package gocw
 
-import "github.com/gohugoio/hugo/identity"
+import (
+	"github.com/gohugoio/hugo/identity"
+	"github.com/gohugoio/hugo/markup/converter"
+)
 
 var (
-	_ converter.ProviderProvider = provider{}
-	_ converter.Converter        = (*converter)(nil)
+	Provider converter.ProviderProvider = provider{}
+	_        converter.Converter        = (*cv)(nil)
 )
 
 type provider struct{}
 
 func (p provider) New(cfg converter.ProviderConfig) (converter.Provider, error) {
-	return converter.NewProvider("pandoc", func(ctx converter.DocumentContext) (converter.Converter, error) {
-		return &converter{
+	return converter.NewProvider("gocodewalk", func(ctx converter.DocumentContext) (converter.Converter, error) {
+		return &cv{
 			ctx: ctx,
 			cfg: cfg,
 		}, nil
@@ -33,13 +36,26 @@ func (p provider) New(cfg converter.ProviderConfig) (converter.Provider, error) 
 
 }
 
-type converter struct {
+type cv struct {
 	ctx converter.DocumentContext
 	cfg converter.ProviderConfig
 }
 
-func (c *converter) Convert(ctx converter.RenderContext) (converter.Result, error) {
-	return converter.Bytes(c.getContent(ctx.Src, c.ctex)), nil
+func (c *cv) Convert(ctx converter.RenderContext) (converter.Result, error) {
+	return converter.Bytes(c.convert(ctx.Src)), nil
 }
 
-func (c *converter) Supports(feature identity.Identity) book { return false }
+func (c *cv) Supports(feature identity.Identity) bool { return false } // TODO
+
+func (c *cv) convert(bs []byte) []byte {
+
+	switch c.ctx.Document.(type) {
+	//case page.Page
+	// cw := loadCodeWalk1()
+	// return applyTemplate(codewalkHTML, "codewalk", cw)
+	// case page bundles?
+	case nil:
+	}
+
+	return nil // TODO
+}
